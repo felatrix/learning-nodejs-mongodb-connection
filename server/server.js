@@ -1,69 +1,33 @@
-var mongoose = require('mongoose');
+var express = require('express');
+var bodyParser = require('body-parser');
 
-mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost:27017/TodoApp');
+var {mongoose} = require('./db/mongoose');
+var {Todo} = require('./models/todo');
+var {User} = require('./models/user');
 
-// var Todo = mongoose.model('Todo',{
-//     text:{
-//         type:String,
-//         required: true,
-//         minlength: 1,
-//         trim: true
-//     },
-//     comleted:{
-//         type:Boolean,
-//         default:false
-//     },
-//     completedAt:{
-//         type:Number,
-//         default:null
-//     }
-// });
+var app = express();
 
-// var newTodo = new Todo({
-//     text:'Cook dinner'
-// });
+app.use(bodyParser.json());
 
-// var newNumberTodo = new Todo({
-//     text:'nama saya younglex'
-// });
-
-// newTodo.save().then((doc)=>{
-//     console.log('save todo',doc);
-// },(e)=>{
-//     console.log('Unable to save todo');
-// });
-
-// newNumberTodo.save().then((doc)=>{
-//     console.log('save number todo',doc);
-// },(e)=>{
-//     console.log('unable to save todo',e);
-// });  
-
-//user
-//email - require it - trim it - set type - set min of length of 1
-
-var Todo = mongoose.model('Todo',{
-    user:{
-        type:String,
-        required: true,
-        minlength: 1,
-        trim: true
-    },
-    email:{
-        type:String,
-        required:true,
-        trim:true,
-        minlength:1
-    }
+app.post('/todos',(req,res)=>{
+    var todo = new Todo({
+        text: req.body.text
+    });
+    todo.save().then((doc)=>{
+        res.send(doc);
+    },(e)=>{
+        res.status(400).send(e);
+    });
 });
 
-var todoEmail = new Todo({
-    user:'iwan',
-    email:'iwansaila@gmail.com'
+app.post('/users',(req,res)=>{
+    var user = new User({
+        email: req.body.email
+    });
+    user.save().then((doc)=>{
+        res.send(doc);
+    },(e)=>{
+        res.status(400).send(e);
+    });
 });
- todoEmail.save().then((doc)=>{
-     console.log(`your user is ${doc.user} and your email is ${doc.email}`);
- },(e)=>{
-     console.log('this input was error ',e);
- });
+app.listen(3000,()=>{console.log('started on port 3000');});
